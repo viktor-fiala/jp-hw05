@@ -12,3 +12,7 @@ class DataFrame(IndexedContainer):
                 raise InvalidDataError()
 
         super().__init__(values, index=index)
+
+    def __len__(self):
+        """Return number of items in the container."""
+        return len(self.index)

@@ -27,3 +27,7 @@ class IndexedContainer:
             return self.values[idx]
         except KeyError:
             return None
+
+    def __len__(self):
+        """Return number of items in the container."""
+        return len(self.values)

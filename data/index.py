@@ -26,5 +26,5 @@ class Index:
         except ValueError:
             raise KeyError(f"Key: {key} is not in Index")
 
-    def __init__(self):
+    def __len__(self):
         return len(self.labels)
