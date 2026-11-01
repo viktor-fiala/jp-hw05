@@ -11,10 +11,11 @@ class Index:
             raise InvalidDataError()
 
         duplicate_keys = DuplicateKeyError(labels)
+
         if duplicate_keys.duplicates:
             raise duplicate_keys
 
-        self.labels = labels[:]
+        self._labels = labels[:]
         self.name = name
 
     def get_loc(self, key):
@@ -27,4 +28,10 @@ class Index:
             raise KeyError(f"Key: {key} is not in Index")
 
     def __len__(self):
+        """Return the number of labels in the index."""
         return len(self.labels)
+
+    @property
+    def labels(self):
+        """Return the labels list."""
+        return self._labels

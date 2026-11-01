@@ -12,6 +12,7 @@ class DuplicateKeyError(Exception):
     """Raised when arg keys consist key duplicates"""
 
     def __init__(self, keys):
+        """Initialize DuplicateKeyError instance."""
         seen = set()
         multiple_keys = set()
 

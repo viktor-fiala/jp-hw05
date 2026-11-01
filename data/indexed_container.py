@@ -6,17 +6,17 @@ class IndexedContainer:
     """Represents a data structure with values and Index."""
 
     def __init__(self, values, index=None):
-        """Initialize IndexedContainer with values and optional i   ndex."""
+        """Initialize IndexedContainer with values and optional index."""
         if not values:
             raise InvalidDataError()
-        self.values = values[:]
+
+        self._values = values[:]
+        self._index = None
 
         if index is None:
             # generates labels from 0 to length of (values - 1)
             new_labels = list(range(len(self.values)))
             self.index = Index(new_labels)
-        elif len(index.labels) != len(self.values):
-            raise IndexMismatchError()
         else:
             self.index = index
 
@@ -31,3 +31,21 @@ class IndexedContainer:
     def __len__(self):
         """Return number of items in the container."""
         return len(self.values)
+
+    @property
+    def values(self):
+        """Return the list of values."""
+        return self._values
+
+    @property
+    def index(self):
+        """Return the Index object of the container."""
+        return self._index
+
+    @index.setter
+    def index(self, new_index):
+        """Set a new Index for the container"""
+        if len(new_index) != len(self.values):
+            raise IndexMismatchError()
+        else:
+            self._index = new_index
