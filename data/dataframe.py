@@ -1,7 +1,7 @@
 from data.indexed_container import IndexedContainer
 from data.series import Series
 from data.index import Index
-from data.exceptions import InvalidDataError, IndexMismatchError
+from data.exceptions import InvalidDataError
 
 
 class DataFrame(IndexedContainer):
@@ -9,9 +9,9 @@ class DataFrame(IndexedContainer):
 
     def __init__(self, values, index=None):
         """Initialize DataFrame with Series columns and an optional index."""
-        for val in values:
-            if not isinstance(val, Series):
-                raise InvalidDataError()
+
+        if not values or any(not isinstance(val, Series) for val in values):
+            raise InvalidDataError()
 
         super().__init__(values, index=index)
 
@@ -32,26 +32,19 @@ class DataFrame(IndexedContainer):
         """Create a new DataFrame from CSV formatted text."""
         text = text.splitlines()
         first_row = text[0].split(separator)
-        new_data_index = []
 
-        for n in range(1, len(first_row)):
-            new_data_index.append(first_row[n])
+        new_data_index = first_row[1:]
 
-        rows = []
-        for r in range(1, len(text)):
-            row = text[r].split(separator)
-            rows.append(row)
+        rows = [row.split(separator) for row in text[1:]]
 
         cols = list(zip(*rows))
         first_col = list(cols[0])
         new_value_index = Index(first_col)
 
-        new_values = []
-        for c in range(1, len(cols)):
-            val = Series(list(cols[c]), index=new_value_index)
-            new_values.append(val)
+        new_values = [Series(list(col), index=new_value_index)
+                      for col in cols[1:]]
 
-        new_dataframe = DataFrame(new_values, index=Index(new_data_index))
+        new_dataframe = cls(new_values, index=Index(new_data_index))
 
         return new_dataframe
 

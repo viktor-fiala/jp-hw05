@@ -14,13 +14,7 @@ class Series(IndexedContainer):
 
     def __repr__(self):
         """Return string representation of Series."""
-        result = ""
-        for i in range(0, len(self.index.labels)):
-            if i < len(self.index.labels) - 1:
-                result += f"{self.index.labels[i]}\t{self.values[i]}\n"
-            else:
-                result += f"{self.index.labels[i]}\t{self.values[i]}"
-        return result
+        return "\n".join(f"{self_lab}\t{self_val}" for self_lab, self_val in zip(self.index.labels, self.values))
 
     def __str__(self):
         """Return string representation of Series."""
@@ -35,9 +29,8 @@ class Series(IndexedContainer):
             raise ValueError("Series must have the same length.")
 
         else:
-            result = []
-            for i in range(len(self)):
-                result.append(operator(self.values[i], other.values[i]))
+            result = [operator(self_val, other_val)
+                      for self_val, other_val in zip(self.values, other.values)]
 
         return Series(result, index=self.index)
 
@@ -83,7 +76,7 @@ class Series(IndexedContainer):
         text = text.splitlines()
         new_values = text[1].split(separator)
         new_index = Index(text[0].split(separator))
-        new_series = Series(new_values, new_index)
+        new_series = cls(new_values, new_index)
 
         return new_series
 
@@ -111,10 +104,8 @@ class Series(IndexedContainer):
 
     def apply(self, func):
         """Apply func to all values and returns new Series."""
-        new_values = []
 
-        for val in self.values:
-            new_values.append(func(val))
+        new_values = [func(val) for val in self.values]
 
         new_series = Series(new_values, self.index)
         return new_series

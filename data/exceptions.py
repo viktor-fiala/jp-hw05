@@ -13,14 +13,7 @@ class DuplicateKeyError(Exception):
 
     def __init__(self, keys):
         """Initialize DuplicateKeyError instance."""
-        seen = set()
-        multiple_keys = set()
-
-        for key in keys:
-            if key in seen:
-                multiple_keys.add(key)
-            else:
-                seen.add(key)
+        multiple_keys = {key for key in keys if keys.count(key) > 1}
 
         duplicates = []
         if multiple_keys:
