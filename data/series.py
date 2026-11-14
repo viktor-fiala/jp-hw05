@@ -20,19 +20,9 @@ class Series(IndexedContainer):
         """Return string representation of Series."""
         return repr(self)
 
-    def _apply_operator(self, other, operator):
-        """Apply binary operator element-wise with another Series."""
-        if not isinstance(other, Series):
-            return NotImplemented
-
-        if len(self) != len(other):
-            raise ValueError("Series must have the same length.")
-
-        else:
-            result = [operator(self_val, other_val)
-                      for self_val, other_val in zip(self.values, other.values)]
-
-        return Series(result, index=self.index)
+    def __iter__(self):
+        """Return generator of Series's values"""
+        return (value for value in self.values)
 
     def __add__(self, other):
         """Element-wise addition (+)."""
@@ -86,21 +76,19 @@ class Series(IndexedContainer):
         val = len(self.values)
         return (val,)
 
-    def max(self):
-        """Return maximum value."""
-        return max(self.values)
+    def _apply_operator(self, other, operator):
+        """Apply binary operator element-wise with another Series."""
+        if not isinstance(other, Series):
+            return NotImplemented
 
-    def min(self):
-        """Return minimum value."""
-        return min(self.values)
+        if len(self) != len(other):
+            raise ValueError("Series must have the same length.")
 
-    def sum(self):
-        """Return sum of values."""
-        return sum(self.values)
+        else:
+            result = [operator(self_val, other_val)
+                      for self_val, other_val in zip(self.values, other.values)]
 
-    def mean(self):
-        """Return arithmetic mean from module statistics."""
-        return mean(self.values)
+        return Series(result, index=self.index)
 
     def apply(self, func):
         """Apply func to all values and returns new Series."""
@@ -113,3 +101,24 @@ class Series(IndexedContainer):
     def abs(self):
         """Return absolute values."""
         return self.apply(abs)
+
+    def iterate_over(self):
+        """Return infinite generator of Series's values"""
+        while True:
+            yield from self.values
+
+    def max(self):
+        """Return maximum value."""
+        return max(self.values)
+
+    def mean(self):
+        """Return arithmetic mean from module statistics."""
+        return mean(self.values)
+
+    def min(self):
+        """Return minimum value."""
+        return min(self.values)
+
+    def sum(self):
+        """Return sum of values."""
+        return sum(self.values)

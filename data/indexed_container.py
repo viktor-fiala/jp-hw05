@@ -6,7 +6,7 @@ class IndexedContainer:
     """Represents a data structure with values and Index."""
 
     def __init__(self, values, index=None):
-        """Initialize IndexedContainer with values and optional index."""
+        """Initialize IndexedContainer with values and optional indexes."""
         if not values:
             raise InvalidDataError()
 
@@ -20,13 +20,10 @@ class IndexedContainer:
         else:
             self.index = index
 
-    def get(self, key):
-        """Return value for specific key."""
-        try:
-            idx = self.index.get_loc(key)
-            return self.values[idx]
-        except KeyError:
-            return None
+    def __getitem__(self, key):
+        """Return value for specific key"""
+        idx = self.index.get_loc(key)
+        return self.values[idx]
 
     def __len__(self):
         """Return number of items in the container."""
@@ -49,3 +46,14 @@ class IndexedContainer:
             raise IndexMismatchError()
         else:
             self._index = new_index
+
+    def get(self, key):
+        """Return value for specific key."""
+        try:
+            return self[key]
+        except KeyError:
+            return None
+
+    def items(self):
+        """Return touple (key, value)"""
+        return zip(self.index, self.values)

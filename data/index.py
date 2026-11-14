@@ -18,20 +18,23 @@ class Index:
         self._labels = labels[:]
         self.name = name
 
-    def get_loc(self, key):
-        """Return index (numeric position) if key exists in Index datastructure."""
-        labels = self.labels
-        # EAFP
-        try:
-            return labels.index(key)
-        except ValueError:
-            raise KeyError(f"Key: {key} is not in Index")
+    def __iter__(self):
+        """Return generator of Index labels."""
+        return (label for label in self.labels)
 
     def __len__(self):
-        """Return the number of labels in the index."""
+        """Return the number of labels in the Index."""
         return len(self.labels)
 
     @property
     def labels(self):
         """Return the labels list."""
         return self._labels
+
+    def get_loc(self, key):
+        """Return index (numeric position) if key exists in Index datastructure."""
+        # EAFP
+        try:
+            return self.labels.index(key)
+        except ValueError:
+            raise KeyError(f"Key: {key} is not in Index")

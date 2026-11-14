@@ -1,18 +1,11 @@
-import pytest
+import types
 
 from data.index import Index
 
 
-@pytest.fixture
-def users():
-    return Index(labels=["user 1", "user 2", "user 3", "user 4"], name="names")
+def test_iter():
+    test_labels = ["key 1", "key 2", "key 3", "key 4", "key 5"]
+    idx = Index(labels=test_labels)
 
-
-def test_len(users):
-    assert len(users) == 4
-
-
-def test_labels_property(users):
-    assert users.labels == ["user 1", "user 2", "user 3", "user 4"]
-    with pytest.raises(AttributeError):
-        users.labels = [] 
+    assert isinstance(idx.__iter__(), types.GeneratorType)
+    assert [label for label in idx] == test_labels

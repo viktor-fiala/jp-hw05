@@ -23,6 +23,10 @@ class DataFrame(IndexedContainer):
         """Return string representation of DataFrame."""
         return repr(self)
 
+    def __iter__(self):
+        """Return generator of Dataframe's indexes"""
+        return (idx for idx in self.index.labels)
+
     def __len__(self):
         """Return number of items in the container."""
         return len(self.index)
