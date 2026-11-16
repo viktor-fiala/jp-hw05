@@ -1,7 +1,8 @@
+import csv
+import operator
 from data.indexed_container import IndexedContainer
 from data.index import Index
 from statistics import mean
-import operator
 
 
 class Series(IndexedContainer):
@@ -61,13 +62,16 @@ class Series(IndexedContainer):
         return self.apply(round_value)
 
     @classmethod
-    def from_csv(cls, text, separator=","):
-        """Create a new Series from CSV formatted text."""
-        text = text.splitlines()
-        new_values = text[1].split(separator)
-        new_index = Index(text[0].split(separator))
-        new_series = cls(new_values, new_index)
+    def from_csv(cls, filepath, separator=","):
+        """Create a new Series from CSV file."""
+        with filepath.open(mode="r", newline="", encoding="utf-8") as file:
+            csv_reader = csv.reader(file, delimiter=separator)
+            rows = list(csv_reader)
 
+        new_values = rows[1]
+        new_index = Index(rows[0])
+
+        new_series = cls(new_values, new_index)
         return new_series
 
     @property

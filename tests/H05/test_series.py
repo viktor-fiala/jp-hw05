@@ -44,17 +44,6 @@ def test_shape(salaries):
     assert salaries.shape == (4,)
 
 
-def test_from_csv(users_data):
-    input_text = """user 1,user 2,user 3,user 4
-Lukas Novak,Petr Pavel,Pavel Petr,Ludek Skocil
-"""
-
-    data = Series.from_csv(text=input_text, separator=",")
-
-    assert data.index.labels == users_data
-    assert list(data.values) == list(
-        ["Lukas Novak", "Petr Pavel", "Pavel Petr", "Ludek Skocil"]
-    )
 
 
 def test_str_repr(salaries):
@@ -126,10 +115,10 @@ def test_operators_exception(operator, salaries):
 
 
 def test_round():
-    assert (
-        round(Series(values=[1.252, 2.23231312]), 2).values
-        == Series(values=[1.25, 2.23]).values
-    )
+    result = round(Series(values=[1.252, 2.23231312]), 2)
+
+    assert isinstance(result, Series)
+    assert result.values == [1.25, 2.23]
 
 
 @pytest.mark.parametrize(

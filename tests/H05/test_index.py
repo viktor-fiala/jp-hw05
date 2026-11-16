@@ -15,4 +15,4 @@ def test_len(users):
 def test_labels_property(users):
     assert users.labels == ["user 1", "user 2", "user 3", "user 4"]
     with pytest.raises(AttributeError):
-        users.labels = [] 
+        users.labels = []

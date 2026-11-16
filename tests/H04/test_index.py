@@ -37,11 +37,10 @@ def test_invalid_key():
 
 def test_label_duplicity():
     with pytest.raises(DuplicateKeyError) as err:
-        Index(labels=["key 1", "key 3", "key 4", "key 1", "key 5"]) 
+        Index(labels=["key 1", "key 3", "key 4", "key 1", "key 5"])
 
-    assert len(err.value.duplicates) == 1
-    assert "key 1" in err.value.duplicates
-        
+    assert err.value.duplicates == ["key 1"]
+
 
 @pytest.mark.parametrize(
     "function",

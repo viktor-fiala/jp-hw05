@@ -4,7 +4,6 @@ import pytest
 from data.index import Index
 from data.series import Series
 from data.dataframe import DataFrame
-from data.exceptions import InvalidDataError, IndexMismatchError
 from data.indexed_container import IndexedContainer
 
 
@@ -25,7 +24,7 @@ def test_series(values_data, idx):
 
     assert salaries.values == values
     assert isinstance(salaries.values, list)
-    assert salaries.index == idx
+    assert salaries.index is idx
     assert isinstance(salaries, IndexedContainer)
 
 
@@ -62,9 +61,11 @@ def test_series_apply(values_data, idx):
 
     result = salaries.apply(func=squared)
 
-    assert salaries != result
+    assert isinstance(result, Series)
     assert salaries is not result
     assert result.values == list(map(squared, values_data))
+    assert result.index.labels == idx.labels
+    assert salaries.values == values_data  # původní Series beze změny
 
 
 def test_series_abs(idx):
@@ -74,17 +75,18 @@ def test_series_abs(idx):
 
     result = salaries.abs()
 
-    assert salaries != result
+    assert isinstance(result, Series)
     assert salaries is not result
     assert result.values == list(map(abs, values))
+    assert salaries.values == [20000, -300000, 20000, -50000]
 
 
 def test_series_parent_class(values_data, idx):
     salaries = Series(values=values_data, index=idx)
 
-    assert isinstance(salaries, IndexedContainer) == True
-    assert isinstance(salaries, DataFrame) == False
-    assert isinstance(salaries, Index) == False
+    assert isinstance(salaries, IndexedContainer)
+    assert not isinstance(salaries, DataFrame)
+    assert not isinstance(salaries, Index)
 
 
 @pytest.mark.parametrize(

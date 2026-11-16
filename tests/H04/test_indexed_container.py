@@ -1,6 +1,5 @@
 import pytest
 
-
 from data.index import Index
 from data.series import Series
 from data.dataframe import DataFrame
@@ -45,16 +44,18 @@ def test_values_mismatch_indexed_container_length(values, labels):
 def test_indexed_container_get(values_data, idx):
     salaries = IndexedContainer(values=values_data, index=idx)
 
+    assert salaries.index is idx
+
     assert salaries.get(key="user 2") == values_data[1]
-    assert salaries.get(key="wrong key") == None
+    assert salaries.get(key="wrong key") is None
 
 
 def test_indexed_container_parent_class(values_data, idx):
     salaries = IndexedContainer(values=values_data, index=idx)
 
-    assert isinstance(salaries, Series) == False
-    assert isinstance(salaries, DataFrame) == False
-    assert isinstance(salaries, Index) == False
+    assert not isinstance(salaries, Series)
+    assert not isinstance(salaries, DataFrame)
+    assert not isinstance(salaries, Index)
 
 
 @pytest.mark.parametrize(

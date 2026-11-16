@@ -26,7 +26,9 @@ def test_index_property(numbers, users):
     
     with pytest.raises(IndexMismatchError):
         numbers.index = Index(labels=[42])
-    
+
+    assert numbers.index == users  # po neúspěchu zůstal původní index
+
     new_index = Index(labels=['a', 'b', 'c', 'd'])
     numbers.index = new_index
     

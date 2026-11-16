@@ -1,64 +1,46 @@
-import types
 import pytest
 
 from data.dataframe import DataFrame
-from data.index import Index
-from data.series import Series
 
 
-@pytest.fixture
-def users():
-    return Index(["user 1", "user 2", "user 3", "user 4"], name="names")
+def test_from_csv(tmp_path):
+    input_text = """,names,salary,cash flow
+user 1,Lukas Novak,20000,-100
+user 2,Petr Pavel,300000,10000
+user 3,Pavel Petr,20000,-2000
+user 4,Ludek Skocil,50000,1100"""
 
+    csv_file = tmp_path / "test.csv"
+    csv_file.write_text(input_text, encoding="utf-8")
 
-@pytest.fixture
-def names(users):
-    return Series(
-        ["Lukas Novak", "Petr Pavel", "Pavel Petr", "Ludek Skocil"], index=users
+    data = DataFrame.from_csv(filepath=csv_file)
+
+    assert data.index.labels == ["names", "salary", "cash flow"]
+
+    assert list(data.values[0].values) == list(
+        ["Lukas Novak", "Petr Pavel", "Pavel Petr", "Ludek Skocil"]
     )
+    assert data.values[0].index.labels == ["user 1", "user 2", "user 3", "user 4"]
+    assert list(data.values[1].values) == list(map(str, [20000, 300000, 20000, 50000]))
+    assert data.values[1].index.labels == ["user 1", "user 2", "user 3", "user 4"]
+    assert list(data.values[2].values) == list(map(str, [-100, 10000, -2000, 1100]))
+    assert data.values[2].index.labels == ["user 1", "user 2", "user 3", "user 4"]
+
+    assert data.get("salary").apply(int).sum() == sum([20000, 300000, 20000, 50000])
 
 
-@pytest.fixture
-def salaries(users):
-    return Series([20000, 300000, 20000, 50000], index=users)
+def test_file_not_found(tmp_path):
+    file = tmp_path / "file_that_does_not_exist"
+
+    with pytest.raises(FileNotFoundError):
+        DataFrame.from_csv(filepath=file)
 
 
-@pytest.fixture
-def cash_flow(users):
-    return Series([-100, 10000, -2000, 1100], index=users)
+def test_from_csv_quoted(tmp_path):
+    # pole v uvozovkách smí obsahovat oddělovač — proto modul csv
+    csv_file = tmp_path / "quoted.csv"
+    csv_file.write_text(',name\nuser 1,"Novak, Lukas"\n', encoding="utf-8")
 
+    data = DataFrame.from_csv(filepath=csv_file)
 
-@pytest.fixture
-def columns():
-    return Index(["names", "salary", "cash flow"])
-
-
-def test_iteratiron(names, salaries, cash_flow, columns):
-    data = DataFrame([names, salaries, cash_flow], index=columns)
-
-    assert isinstance(data.__iter__(), types.GeneratorType)
-    assert list(data) == columns.labels
-
-
-def test_items(names, salaries, cash_flow, columns):
-    data = DataFrame([names, salaries, cash_flow], index=columns)
-
-    assert isinstance(data.items(), zip)
-
-    test_columns = []
-    test_values = []
-
-    for column, value in data.items():
-        test_columns.append(column)
-        test_values.append(value)
-
-    assert test_columns == columns.labels
-    assert test_values == [names, salaries, cash_flow]
-
-
-@pytest.mark.parametrize(
-    "function",
-    [DataFrame, DataFrame.from_csv, DataFrame.get, DataFrame.shape, DataFrame.items],
-)
-def test_docstrings(function):
-    assert function.__doc__ is not None
+    assert data.get("name").values == ["Novak, Lukas"]

@@ -37,12 +37,12 @@ def test_dataframe(users_data, salaries_data, names_data, cash_flow_data):
     index = Index(labels=["names", "salary", "cash flow"])
     data = DataFrame(values=[names, salaries, cash_flow], index=index)
 
-    assert data.index == index
+    assert data.index is index
     assert data.values == [names, salaries, cash_flow]
     assert isinstance(data.values, list)
-    assert data.get(key="salary") == salaries
+    assert data.get(key="salary") is salaries
     assert data.get(key="cash flow").max() == 10000
-    assert data.get(key="wrong key") == None
+    assert data.get(key="wrong key") is None
     assert isinstance(data, IndexedContainer)
 
 
@@ -56,12 +56,12 @@ def test_dataframe_parent_class(users_data, salaries_data, names_data, cash_flow
     index = Index(labels=["names", "salary", "cash flow"])
     data = DataFrame(values=[names, salaries, cash_flow], index=index)
 
-    assert isinstance(data, IndexedContainer) == True
-    assert isinstance(data, Series) == False
-    assert isinstance(data, Index) == False
+    assert isinstance(data, IndexedContainer)
+    assert not isinstance(data, Series)
+    assert not isinstance(data, Index)
 
 
-def test_dataframe_valuues(users_data, salaries_data, names_data, cash_flow_data):
+def test_dataframe_values(users_data, salaries_data, names_data, cash_flow_data):
     users = Index(labels=users_data, name="names")
 
     salaries = Series(values=salaries_data, index=users)
@@ -70,6 +70,10 @@ def test_dataframe_valuues(users_data, salaries_data, names_data, cash_flow_data
 
     index = Index(labels=["names", "salary", "cash flow"])
 
+    with pytest.raises(InvalidDataError):
+        DataFrame(values=[salaries, names, 42], index=index)
+
+    # typ sloupců se kontroluje dřív než délka indexu
     with pytest.raises(InvalidDataError):
         DataFrame(values=[salaries, names, 42, cash_flow], index=index)
 
@@ -90,7 +94,7 @@ def test_empty_index(users_data, salaries_data, names_data, cash_flow_data):
 
     assert data.index.labels == Index(labels=list(range(3))).labels
     assert data.values == [names, salaries, cash_flow]
-    assert data.get(key=1) == salaries
+    assert data.get(key=1) is salaries
     assert data.get(key=2).max() == 10000
 
 

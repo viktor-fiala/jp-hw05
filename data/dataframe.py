@@ -1,3 +1,5 @@
+import pathlib
+import csv
 from data.indexed_container import IndexedContainer
 from data.series import Series
 from data.index import Index
@@ -32,16 +34,17 @@ class DataFrame(IndexedContainer):
         return len(self.index)
 
     @classmethod
-    def from_csv(cls, text, separator=","):
-        """Create a new DataFrame from CSV formatted text."""
-        text = text.splitlines()
-        first_row = text[0].split(separator)
+    def from_csv(cls, filepath, separator=","):
+        """Create a new DataFrame from CSV file."""
+        with filepath.open(mode="r", newline="", encoding="utf-8") as file:
+            csv_reader = csv.reader(file, delimiter=separator)
+            rows = list(csv_reader)
 
-        new_data_index = first_row[1:]
+        new_data_index = rows[0][1:]
 
-        rows = [row.split(separator) for row in text[1:]]
-
+        rows = rows[1:]
         cols = list(zip(*rows))
+
         first_col = list(cols[0])
         new_value_index = Index(first_col)
 
@@ -49,7 +52,6 @@ class DataFrame(IndexedContainer):
                       for col in cols[1:]]
 
         new_dataframe = cls(new_values, index=Index(new_data_index))
-
         return new_dataframe
 
     @property

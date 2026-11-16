@@ -1,0 +1,72 @@
+import types
+import pytest
+
+from data.dataframe import DataFrame
+from data.index import Index
+from data.series import Series
+
+
+@pytest.fixture
+def users():
+    return Index(["user 1", "user 2", "user 3", "user 4"], name="names")
+
+
+@pytest.fixture
+def names(users):
+    return Series(
+        ["Lukas Novak", "Petr Pavel", "Pavel Petr", "Ludek Skocil"], index=users
+    )
+
+
+@pytest.fixture
+def salaries(users):
+    return Series([20000, 300000, 20000, 50000], index=users)
+
+
+@pytest.fixture
+def cash_flow(users):
+    return Series([-100, 10000, -2000, 1100], index=users)
+
+
+@pytest.fixture
+def columns():
+    return Index(["names", "salary", "cash flow"])
+
+
+def test_iteration(names, salaries, cash_flow, columns):
+    data = DataFrame([names, salaries, cash_flow], index=columns)
+
+    assert isinstance(data.__iter__(), types.GeneratorType)
+    assert list(data) == columns.labels
+
+
+def test_getitem(names, salaries, cash_flow, columns):
+    data = DataFrame([names, salaries, cash_flow], index=columns)
+
+    assert data["salary"] is salaries
+    with pytest.raises(KeyError):
+        data["wrong key"]
+
+
+def test_items(names, salaries, cash_flow, columns):
+    data = DataFrame([names, salaries, cash_flow], index=columns)
+
+    assert isinstance(data.items(), zip)
+
+    test_columns = []
+    test_values = []
+
+    for column, value in data.items():
+        test_columns.append(column)
+        test_values.append(value)
+
+    assert test_columns == columns.labels
+    assert test_values == [names, salaries, cash_flow]
+
+
+@pytest.mark.parametrize(
+    "function",
+    [DataFrame, DataFrame.from_csv, DataFrame.get, DataFrame.shape, DataFrame.items],
+)
+def test_docstrings(function):
+    assert function.__doc__ is not None
